@@ -3,260 +3,275 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <title>אוולין הולכת</title>
+  <title>אוולין · ScratchJr</title>
   <style>
-    :root { --ink:#243044; --muted:#5d6b80; --blue:#2f7cf6; --blue-d:#1d56c4; --purple:#7b5cff; --green:#2f9e6b; --green-d:#1d7a50; }
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    html, body { margin: 0; height: 100%; }
-    body { display:flex; justify-content:center; background:#8eb7dc; color:var(--ink); font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif; }
-    .app { width:min(100vw,440px); min-height:100dvh; background:linear-gradient(#d7eeff 0 58%, #c5e39a 58%); display:flex; flex-direction:column; position:relative; overflow:hidden; }
-    .top { display:flex; align-items:center; justify-content:space-between; padding:12px 14px 0; }
-    h1 { margin:0; font-size:22px; }
-    .ghost { border:0; background:transparent; color:var(--muted); font:inherit; font-weight:800; font-size:15px; padding:8px; }
-    .hint { margin:4px 16px 0; min-height:1.3em; font-size:18px; font-weight:800; }
-    .stage { position:relative; height:290px; margin:8px 12px; }
-    .grid {
-      position:absolute; left:8%; right:8%; top:18px; bottom:8px;
-      display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr); gap:8px;
+    :root {
+      --motion:#4C97FF; --motion-d:#3373CC;
+      --trigger:#FFBF00; --trigger-d:#E6A800;
+      --looks:#9966FF; --looks-d:#774DCB;
+      --end:#FF6680; --end-d:#E64D67;
+      --ink:#333;
     }
-    .cell { border-radius:16px; background:rgba(255,255,255,.35); border:3px dashed rgba(36,48,68,.12); }
-    .girl { position:absolute; width:72px; margin-left:-36px; margin-top:-8px; z-index:3; transition:left .35s, top .35s, transform .25s, opacity .25s; }
-    .girl img, .star img { width:100%; display:block; }
-    .star { position:absolute; width:54px; margin-left:-27px; z-index:2; }
-    .panel { background:#fffdf8; border-radius:26px 28px 0 0; padding:10px 12px calc(12px + env(safe-area-inset-bottom)); box-shadow:0 -8px 20px rgba(36,48,68,.08); }
-    .cats { display:flex; gap:8px; margin-bottom:8px; }
-    .cats button { border:0; background:#eef3fb; color:var(--ink); font:inherit; font-weight:800; border-radius:999px; padding:8px 12px; }
-    .cats button.on { background:var(--blue); color:white; }
-    .label { margin:0 4px 6px; font-size:13px; font-weight:800; color:var(--muted); }
-    .strip { min-height:70px; border-radius:16px; background:#eef3fb; display:flex; flex-direction:row-reverse; align-items:center; padding:8px; overflow-x:auto; }
-    .strip.empty::before { content:"כאן שמים את הבלוק"; color:#9aa6b5; font-weight:800; padding:0 8px; }
-    .palette { display:flex; gap:8px; overflow-x:auto; margin-top:10px; padding-bottom:2px; }
-    .block, .go {
-      border:0; color:white; font:inherit; font-weight:900;
+    * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html, body { margin:0; height:100%; }
+    body { display:flex; justify-content:center; background:#6d6d6d; color:var(--ink); font-family:Arial,"Arial Hebrew",sans-serif; }
+    .app { width:min(100vw,480px); min-height:100dvh; background:#f2f2f2; display:flex; flex-direction:column; }
+    .top { display:flex; align-items:center; justify-content:space-between; padding:8px 10px; background:#fff; }
+    h1 { margin:0; font-size:18px; }
+    .ghost { border:0; background:transparent; font:inherit; font-weight:700; font-size:15px; }
+    .stage-wrap { background:#d9d9d9; padding:8px; }
+    .stage {
+      position:relative; height:250px; background:linear-gradient(#7ec8f8 0 62%, #8fd16a 62%);
+      border:4px solid #fff; border-radius:8px; overflow:hidden;
     }
-    .block { background:linear-gradient(#5b95ff,var(--blue)); min-width:96px; height:56px; border-radius:14px; box-shadow:0 4px 0 var(--blue-d); font-size:18px; }
-    .block.look { background:linear-gradient(#9b86ff,var(--purple)); box-shadow:0 4px 0 #5436d6; }
-    .block.in { min-width:84px; height:52px; font-size:16px; margin-left:-7px; }
+    .flag {
+      position:absolute; top:8px; left:8px; z-index:4;
+      width:54px; height:54px; border:0; border-radius:8px;
+      background:#3cb44a; color:#fff; font-size:28px;
+      box-shadow:0 3px 0 #2d8a38;
+    }
+    .grid { position:absolute; inset:36px 10px 8px; display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr); }
+    .cell { border:2px dashed rgba(255,255,255,.35); border-radius:10px; }
+    .cat { position:absolute; width:78px; margin-left:-39px; z-index:3; transition:left .32s, top .32s, transform .2s; }
+    .cat img { width:100%; display:block; }
+    .star { position:absolute; width:46px; margin-left:-23px; z-index:2; font-size:40px; line-height:1; }
+    .work { flex:1; display:flex; flex-direction:column; background:#e6e6e6; min-height:0; }
+    .scriptbar { display:flex; align-items:center; gap:8px; padding:6px 10px 0; }
+    .scriptbar span { font-size:13px; font-weight:700; color:#666; }
+    .strip {
+      direction:ltr;
+      min-height:78px; margin:6px 10px; background:#fff; border-radius:10px;
+      display:flex; align-items:center; padding:8px; overflow-x:auto; gap:0;
+    }
+    .strip.empty::before { content:"גררי בלוק לכאן"; color:#aaa; font-weight:700; }
+    .palette { direction:ltr; display:flex; gap:8px; overflow-x:auto; padding:4px 10px 8px; }
+    .cats { display:flex; gap:6px; padding:0 10px; }
+    .cats button { width:36px; height:28px; border:0; border-radius:8px; }
+    .cats button.on { outline:3px solid #333; }
+    .block {
+      direction:ltr;
+      border:0; color:#fff; font-weight:800;
+      min-width:74px; height:58px; padding:0 10px;
+      display:inline-flex; align-items:center; justify-content:center; gap:4px;
+      font-size:22px;
+      border-radius:8px 16px 16px 14px;
+      position:relative;
+    }
+    .block.motion { background:var(--motion); box-shadow:0 4px 0 var(--motion-d); }
+    .block.trigger { background:var(--trigger); box-shadow:0 4px 0 var(--trigger-d); color:#333; }
+    .block.looks { background:var(--looks); box-shadow:0 4px 0 var(--looks-d); }
+    .block.end { background:var(--end); box-shadow:0 4px 0 var(--end-d); }
+    .block.in { margin-left:-6px; }
     .block.in:first-child { margin-left:0; }
-    .block:active { transform:translateY(3px); }
-    .go { flex:1; height:56px; border-radius:16px; background:var(--green); box-shadow:0 4px 0 var(--green-d); font-size:20px; }
-    .say { text-align:center; font-weight:800; min-height:1.2em; margin:8px 0 0; }
-    .say.good { color:var(--green); }
-    .overlay { position:absolute; inset:0; background:rgba(215,238,255,.97); z-index:6; display:flex; flex-direction:column; justify-content:flex-end; padding:22px 16px calc(18px + env(safe-area-inset-bottom)); gap:10px; }
-    .overlay h2 { margin:0; font-size:28px; }
-    .overlay p { margin:0; font-size:18px; font-weight:750; line-height:1.4; }
+    .block small { font-size:11px; font-weight:700; }
+    .say { margin:0; padding:0 12px 10px; font-weight:800; min-height:1.2em; }
+    .say.good { color:#2d8a38; }
+    .overlay { position:fixed; inset:0; background:rgba(242,242,242,.97); z-index:8; display:flex; flex-direction:column; justify-content:flex-end; padding:20px 16px 24px; gap:10px; }
+    .overlay h2 { margin:0; font-size:26px; }
+    .overlay p { margin:0; font-size:17px; font-weight:700; line-height:1.4; }
     .lessons { display:flex; flex-direction:column; gap:8px; }
-    .lessons button { text-align:right; background:white; border:0; border-radius:16px; padding:12px 14px; font:inherit; font-weight:800; font-size:17px; }
-    .lessons button small { display:block; color:var(--muted); font-weight:700; }
-    .lessons button:disabled { opacity:.45; }
+    .lessons button { text-align:right; background:#fff; border:0; border-radius:14px; padding:12px; font:inherit; font-weight:800; font-size:17px; }
+    .lessons button small { display:block; color:#777; }
+    .lessons button:disabled { opacity:.4; }
     .hidden { display:none !important; }
+    .go { border:0; background:#3cb44a; color:#fff; font:inherit; font-weight:800; font-size:20px; height:54px; border-radius:12px; }
   </style>
 </head>
 <body>
   <div class="app">
     <div class="top">
-      <h1 id="title">אוולין הולכת</h1>
+      <h1 id="title">ScratchJr</h1>
       <button class="ghost" id="home" type="button">שיעורים</button>
     </div>
-    <p class="hint" id="hint">תסתכלי</p>
-    <div class="stage">
-      <div class="grid" id="grid"></div>
-      <div class="star hidden" id="star"><img src="img/star.png" alt=""></div>
-      <div class="girl" id="girl"><img src="img/girl.png" alt=""></div>
+    <div class="stage-wrap">
+      <div class="stage" id="stage">
+        <button class="flag" id="flag" type="button" title="דגל ירוק">⚑</button>
+        <div class="grid" id="grid"></div>
+        <div class="star hidden" id="star">★</div>
+        <div class="cat" id="cat"><img src="img/cat.png" alt=""></div>
+      </div>
     </div>
-    <div class="panel">
-      <div class="cats" id="cats"></div>
-      <p class="label" id="label">השורה</p>
+    <div class="work">
+      <div class="scriptbar"><span id="label">השורה. לוחצים על הבלוק.</span></div>
       <div class="strip empty" id="strip"></div>
+      <div class="cats" id="cats"></div>
       <div class="palette" id="palette"></div>
       <p class="say" id="say"></p>
     </div>
-
     <div class="overlay hidden" id="menu">
-      <h2>השיעורים</h2>
-      <p>כמו ב־ScratchJr של MIT. קודם בלוק אחד. אחר כך שורה.</p>
+      <h2>כמו ב־ScratchJr</h2>
+      <p>אותו חתול, אותו דגל ירוק, אותם בלוקים. ככה תזהי את זה אחר כך.</p>
       <div class="lessons" id="lessons"></div>
-    </div>
-    <div class="overlay hidden" id="momCard">
-      <h2>לאמא</h2>
-      <p>שיעור 1: הבלוק הוא כפתור. שמים בשורה, לוחצים, הדמות זזה. ימינה, שמאלה, למעלה, למטה.</p>
-      <p>שיעור 2: אותו בלוק כמה פעמים, בסדר, עד הכוכב. בית מחזיר להתחלה.</p>
-      <p>המקור: Animated Genres, Tufts ו־MIT. הציורים שלנו.</p>
-      <button class="go" id="momClose" type="button">חזרה</button>
     </div>
   </div>
 <script>
-const COLS = 3, ROWS = 3;
-const MOTION = [
-  {id:"right", name:"ימינה", kind:"motion"},
-  {id:"left", name:"שמאלה", kind:"motion"},
-  {id:"up", name:"למעלה", kind:"motion"},
-  {id:"down", name:"למטה", kind:"motion"},
-  {id:"home", name:"בית", kind:"motion"}
+const CATS = [
+  {id:"trigger", color:"#FFBF00"},
+  {id:"motion", color:"#4C97FF"},
+  {id:"looks", color:"#9966FF"}
 ];
-const LOOKS = [
-  {id:"bigger", name:"גדול", kind:"look"},
-  {id:"smaller", name:"קטן", kind:"look"}
-];
+const BLOCKS = {
+  trigger: [{id:"flag", name:"דגל", icon:"⚑", cls:"trigger"}],
+  motion: [
+    {id:"right", name:"ימינה", icon:"→", cls:"motion"},
+    {id:"left", name:"שמאלה", icon:"←", cls:"motion"},
+    {id:"up", name:"למעלה", icon:"↑", cls:"motion"},
+    {id:"down", name:"למטה", icon:"↓", cls:"motion"},
+    {id:"home", name:"בית", icon:"⌂", cls:"motion"}
+  ],
+  looks: [
+    {id:"bigger", name:"גדול", icon:"+", cls:"looks"},
+    {id:"smaller", name:"קטן", icon:"−", cls:"looks"}
+  ]
+};
 const LESSONS = [
-  {n:1, title:"הוראות", sub:"בלוק אחד מזיז", open:true},
+  {n:1, title:"הוראות", sub:"בלוק בשורה, לחיצה מזיזה", open:true},
   {n:2, title:"סדר", sub:"כמה בלוקים עד הכוכב", open:true},
   {n:3, title:"דגל ירוק", sub:"אחר כך", open:false},
   {n:4, title:"רקע ודמויות", sub:"אחר כך", open:false}
 ];
-
-const girl = document.getElementById("girl");
-const star = document.getElementById("star");
 const grid = document.getElementById("grid");
-const stripEl = document.getElementById("strip");
+const cat = document.getElementById("cat");
+const star = document.getElementById("star");
+const strip = document.getElementById("strip");
 const palette = document.getElementById("palette");
-const cats = document.getElementById("cats");
-const hint = document.getElementById("hint");
+const catsEl = document.getElementById("cats");
 const say = document.getElementById("say");
 const title = document.getElementById("title");
 const label = document.getElementById("label");
 const menu = document.getElementById("menu");
 
-let col = 1, row = 1, scale = 1, script = [], lesson = 1, cat = "motion";
+let col=1, row=1, scale=1, script=[], lesson=1, catTab="motion";
 const seen = new Set();
 
-for (let i = 0; i < 9; i++) {
-  const c = document.createElement("div");
-  c.className = "cell";
-  grid.appendChild(c);
-}
+for (let i=0;i<9;i++) grid.appendChild(Object.assign(document.createElement("div"), {className:"cell"}));
 
-function cellPos(c, r) {
-  const stage = document.querySelector(".stage");
+function pos(c,r) {
+  const stage = document.getElementById("stage");
   const g = grid.getBoundingClientRect();
   const s = stage.getBoundingClientRect();
-  const cw = g.width / 3, ch = g.height / 3;
-  return {
-    left: (g.left - s.left) + c * cw + cw / 2,
-    top: (g.top - s.top) + r * ch + ch / 2 - 28
-  };
+  const cw = g.width/3, ch = g.height/3;
+  return { left:(g.left-s.left)+c*cw+cw/2, top:(g.top-s.top)+r*ch+ch/2-30 };
 }
-function drawGirl() {
-  const p = cellPos(col, row);
-  girl.style.left = p.left + "px";
-  girl.style.top = p.top + "px";
-  girl.style.transform = "scale(" + scale + ")";
+function draw() {
+  const p = pos(col,row);
+  cat.style.left = p.left+"px";
+  cat.style.top = p.top+"px";
+  cat.style.transform = "scale("+scale+")";
 }
-function placeStar(on) {
+function showStar(on) {
   star.classList.toggle("hidden", !on);
   if (!on) return;
-  const p = cellPos(2, 1);
-  star.style.left = p.left + "px";
-  star.style.top = (p.top + 10) + "px";
+  const p = pos(2,1);
+  star.style.left = p.left+"px";
+  star.style.top = (p.top+6)+"px";
 }
-function home() { col = 1; row = 1; scale = 1; girl.style.opacity = 1; drawGirl(); }
-
+function home() { col=1; row=1; scale=1; draw(); }
 function apply(id) {
-  if (id === "right") col = Math.min(2, col + 1);
-  if (id === "left") col = Math.max(0, col - 1);
-  if (id === "up") row = Math.max(0, row - 1);
-  if (id === "down") row = Math.min(2, row + 1);
-  if (id === "home") { col = 1; row = 1; scale = 1; girl.style.opacity = 1; }
-  if (id === "bigger") scale = Math.min(1.35, scale + 0.2);
-  if (id === "smaller") scale = Math.max(0.7, scale - 0.2);
-  drawGirl();
+  if (id==="right") col=Math.min(2,col+1);
+  if (id==="left") col=Math.max(0,col-1);
+  if (id==="up") row=Math.max(0,row-1);
+  if (id==="down") row=Math.min(2,row+1);
+  if (id==="home" || id==="flag") { col=1; row=1; scale=1; }
+  if (id==="bigger") scale=Math.min(1.35, scale+0.18);
+  if (id==="smaller") scale=Math.max(0.72, scale-0.18);
+  draw();
   seen.add(id);
 }
-
+function find(id) {
+  return Object.values(BLOCKS).flat().find(b => b.id===id);
+}
 function renderStrip() {
-  stripEl.innerHTML = "";
-  stripEl.classList.toggle("empty", script.length === 0);
-  script.forEach((id, i) => {
-    const def = [...MOTION, ...LOOKS].find(b => b.id === id);
+  strip.innerHTML = "";
+  strip.classList.toggle("empty", script.length===0);
+  script.forEach((id,i) => {
+    const def = find(id);
     const b = document.createElement("button");
     b.type = "button";
-    b.className = "block in" + (def.kind === "look" ? " look" : "");
-    b.textContent = def.name;
+    b.className = "block in "+def.cls;
+    b.innerHTML = def.icon+"<small>"+def.name+"</small>";
     b.addEventListener("click", () => runFrom(i));
-    stripEl.appendChild(b);
+    strip.appendChild(b);
   });
 }
 function addBlock(id) {
-  if (lesson === 1 && script.length >= 1 && id !== script[0]) script = [];
-  if (script.length >= 6) return;
+  if (lesson===1 && script.length && script[0]!==id) script = [];
+  if (script.length>=6) return;
   script.push(id);
   renderStrip();
-  say.textContent = lesson === 1 ? "עכשיו לחצי על הבלוק בשורה" : "";
+  say.className = "say";
+  say.textContent = "לחצי על הבלוק בשורה";
 }
 function runFrom(i) {
-  const steps = lesson === 1 ? script.slice(i, i + 1) : script.slice(i);
+  const steps = lesson===1 ? script.slice(i,i+1) : script.slice(i);
   steps.forEach(apply);
-  if (lesson === 1) checkLesson1();
-  if (lesson === 2) checkLesson2();
+  if (lesson===1) check1();
+  if (lesson===2) check2();
 }
-function checkLesson1() {
+function check1() {
   const need = ["right","left","up","down"];
   const left = need.filter(id => !seen.has(id));
   if (!left.length) {
     say.className = "say good";
-    say.textContent = "ארבע הוראות. שיעור 1 גמור.";
-    hint.textContent = "אפשר לעבור לשיעור 2";
+    say.textContent = "שיעור 1 גמור. ארבע הוראות.";
+  } else {
+    const names = {right:"ימינה", left:"שמאלה", up:"למעלה", down:"למטה"};
+    say.className = "say";
+    say.textContent = "עוד: " + left.map(id => names[id]).join(" · ");
+  }
+}
+function check2() {
+  if (col===2 && row===1) {
+    say.className = "say good";
+    say.textContent = "הגעת לכוכב.";
   } else {
     say.className = "say";
-    const names = {right:"ימינה", left:"שמאלה", up:"למעלה", down:"למטה"};
-    say.textContent = "עוד: " + left.map(id => names[id]).join(" ");
+    say.textContent = "עוד לא. בית, ואז שורה חדשה.";
   }
 }
-function checkLesson2() {
-  if (col === 2 && row === 1) {
-    say.className = "say good";
-    say.textContent = "הגעת. הסדר עבד.";
-    star.style.transform = "scale(1.15)";
-  } else if (script.length) {
-    say.className = "say";
-    say.textContent = "עוד לא על הכוכב. אפשר בית, ואז שורה חדשה.";
-  }
-}
-
-function paintPalette() {
-  cats.innerHTML = "";
-  [["motion","תנועה"],["look","מראה"]].forEach(([id, name]) => {
+function paint() {
+  catsEl.innerHTML = "";
+  CATS.forEach(c => {
     const b = document.createElement("button");
     b.type = "button";
-    b.textContent = name;
-    b.className = cat === id ? "on" : "";
-    b.addEventListener("click", () => { cat = id; paintPalette(); });
-    cats.appendChild(b);
+    b.style.background = c.color;
+    if (c.id===catTab) b.className = "on";
+    b.addEventListener("click", () => { catTab=c.id; paint(); });
+    catsEl.appendChild(b);
   });
   palette.innerHTML = "";
-  const list = cat === "motion" ? MOTION.filter(b => lesson === 2 || b.id !== "home") : LOOKS;
-  list.forEach(def => {
+  BLOCKS[catTab].forEach(def => {
+    if (lesson===1 && def.id==="home") return;
     const b = document.createElement("button");
     b.type = "button";
-    b.className = "block" + (def.kind === "look" ? " look" : "");
-    b.textContent = def.name;
+    b.className = "block "+def.cls;
+    b.innerHTML = def.icon+"<small>"+def.name+"</small>";
     b.addEventListener("click", () => addBlock(def.id));
     palette.appendChild(b);
   });
 }
-
-function startLesson(n) {
+function start(n) {
   lesson = n;
   script = [];
+  seen.clear();
   menu.classList.add("hidden");
   home();
-  paintPalette();
+  paint();
   renderStrip();
   say.textContent = "";
-  if (n === 1) {
-    title.textContent = "שיעור 1 · הוראות";
-    hint.textContent = "שימי בלוק בשורה, ואז לחצי עליו";
-    label.textContent = "השורה. לחיצה על הבלוק מזיזה.";
-    placeStar(false);
+  if (n===1) {
+    title.textContent = "שיעור 1";
+    label.textContent = "שימי בלוק בשורה. לחצי עליו.";
+    showStar(false);
+    catTab = "motion";
   } else {
-    title.textContent = "שיעור 2 · סדר";
-    hint.textContent = "כמה בלוקים ימינה, עד הכוכב";
-    label.textContent = "לחיצה על הבלוק הראשון מריצה את כל השורה";
-    placeStar(true);
+    title.textContent = "שיעור 2";
+    label.textContent = "כמה בלוקים ברצף. לחיצה על הראשון מריצה הכל.";
+    showStar(true);
+    catTab = "motion";
   }
+  paint();
 }
-
 function showMenu() {
   menu.classList.remove("hidden");
   const box = document.getElementById("lessons");
@@ -265,35 +280,18 @@ function showMenu() {
     const b = document.createElement("button");
     b.type = "button";
     b.disabled = !L.open;
-    b.innerHTML = "שיעור " + L.n + " · " + L.title + "<small>" + L.sub + "</small>";
-    if (L.open) b.addEventListener("click", () => startLesson(L.n));
+    b.innerHTML = "שיעור "+L.n+" · "+L.title+"<small>"+L.sub+"</small>";
+    if (L.open) b.addEventListener("click", () => start(L.n));
     box.appendChild(b);
   });
 }
-
 document.getElementById("home").addEventListener("click", showMenu);
-document.getElementById("momClose").addEventListener("click", () => document.getElementById("momCard").classList.add("hidden"));
-
-async function intro() {
-  title.textContent = "הדגמה";
-  hint.textContent = "בלוק הוא צעד";
-  cats.innerHTML = "";
-  palette.innerHTML = "";
-  placeStar(true);
-  home();
-  script = ["right","right"];
-  renderStrip();
-  await new Promise(r => setTimeout(r, 700));
-  apply("right");
-  await new Promise(r => setTimeout(r, 450));
-  apply("right");
-  say.className = "say good";
-  say.textContent = "ככה זה עובד";
-  await new Promise(r => setTimeout(r, 700));
-  showMenu();
-}
-window.addEventListener("resize", drawGirl);
-setTimeout(() => { drawGirl(); intro(); }, 60);
+document.getElementById("flag").addEventListener("click", () => {
+  if (script[0]==="flag" || lesson===2) runFrom(0);
+  else { home(); say.textContent = "הדגל הירוק. בשיעור 3 הוא מתחיל את השורה."; }
+});
+window.addEventListener("resize", () => { draw(); if (!star.classList.contains("hidden")) showStar(true); });
+setTimeout(() => { draw(); showMenu(); }, 40);
 </script>
 </body>
 </html>
