@@ -202,9 +202,20 @@ function addBlock(id) {
   say.className = "say";
   say.textContent = "לחצי על הבלוק בשורה";
 }
-function runFrom(i) {
-  const steps = lesson===1 ? script.slice(i,i+1) : script.slice(i);
-  steps.forEach(apply);
+let busy = false;
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+async function runFrom(i) {
+  if (busy || !script.length) return;
+  busy = true;
+  say.className = "say";
+  say.textContent = "";
+  if (lesson === 2) home();
+  const steps = lesson===1 ? script.slice(i, i+1) : script.slice(i);
+  for (const id of steps) {
+    apply(id);
+    await sleep(420);
+  }
+  busy = false;
   if (lesson===1) check1();
   if (lesson===2) check2();
 }
@@ -226,7 +237,7 @@ function check2() {
     say.textContent = "הגעת לכוכב.";
   } else {
     say.className = "say";
-    say.textContent = "עוד לא. בית, ואז שורה חדשה.";
+    say.textContent = "עוד לא על הכוכב. לחצי על הבלוק הראשון שוב.";
   }
 }
 function paint() {
@@ -287,7 +298,8 @@ function showMenu() {
 }
 document.getElementById("home").addEventListener("click", showMenu);
 document.getElementById("flag").addEventListener("click", () => {
-  if (script[0]==="flag" || lesson===2) runFrom(0);
+  if (lesson===2 && script.length) runFrom(0);
+  else if (script[0]==="flag") runFrom(0);
   else { home(); say.textContent = "הדגל הירוק. בשיעור 3 הוא מתחיל את השורה."; }
 });
 window.addEventListener("resize", () => { draw(); if (!star.classList.contains("hidden")) showStar(true); });
