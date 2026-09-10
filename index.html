@@ -596,7 +596,7 @@ function paintPalette(){
   }
   if(lesson===5){
     if(tab==="trigger") list=BLOCKS.trigger.filter(d=>d.id==="flag");
-    if(tab==="motion") list=BLOCKS.motion.filter(d=>["right","left","home"].includes(d.id));
+    if(tab==="motion") list=BLOCKS.motion.filter(d=>["right","left","up","down","home"].includes(d.id));
     if(tab==="control") list=BLOCKS.control.filter(d=>d.id==="speed");
     if(tab==="end") list=BLOCKS.end;
   }
