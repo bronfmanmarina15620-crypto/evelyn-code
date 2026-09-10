@@ -9,6 +9,8 @@
       --motion:#4C97FF; --motion-d:#3373CC;
       --trigger:#FFBF00; --trigger-d:#E6A800;
       --looks:#9966FF; --looks-d:#774DCB;
+      --sound:#CF63CF; --sound-d:#A63EA6;
+      --control:#FFAB19; --control-d:#CF8B17;
       --end:#FF6680; --end-d:#E64D67;
     }
     * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -23,23 +25,35 @@
     .bg-sky { background:linear-gradient(#7ec8f8 0 62%, #8fd16a 62%); }
     .bg-night { background:linear-gradient(#1b2a4a 0 62%, #2f4a2a 62%); }
     .bg-beach { background:linear-gradient(#87ceeb 0 58%, #f2d38a 58%); }
+    .bg-race { background:linear-gradient(#9fd0ff 0 55%, #c9c9c9 55%); }
     .flag {
       position:absolute; top:8px; left:8px; z-index:5;
       width:52px; height:52px; border:0; border-radius:8px;
       background:#3cb44a; color:#fff; font-size:26px; box-shadow:0 3px 0 #2d8a38;
     }
+    .pagebadge {
+      position:absolute; top:8px; right:8px; z-index:5;
+      background:#fff; border-radius:8px; padding:4px 8px; font-weight:900; font-size:13px;
+    }
     .grid { position:absolute; inset:36px 8px 8px; display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr); }
     .cell { border:2px dashed rgba(255,255,255,.35); border-radius:10px; }
-    .sprite { position:absolute; width:70px; margin-left:-35px; z-index:3; transition:left .3s, top .3s, transform .2s; }
+    .sprite { position:absolute; width:70px; margin-left:-35px; z-index:3; transition:left .3s linear, top .3s linear, transform .2s, opacity .2s; }
     .sprite img { width:100%; display:block; }
     .sprite.sel { outline:3px solid #ffbf00; outline-offset:2px; border-radius:8px; }
+    .bubble {
+      position:absolute; z-index:6; background:#fff; border:2px solid #333; border-radius:14px;
+      padding:6px 10px; font-weight:900; font-size:14px; max-width:120px; display:none;
+    }
     .star { position:absolute; width:42px; margin-left:-21px; z-index:2; font-size:38px; line-height:1; color:#f0b429; }
     .work { flex:1; display:flex; flex-direction:column; background:#e6e6e6; min-height:0; }
-    .hint { margin:6px 12px 0; font-weight:800; font-size:16px; min-height:1.3em; }
+    .hint { margin:6px 12px 0; font-weight:800; font-size:15px; min-height:1.3em; }
     .actors { display:flex; gap:8px; padding:6px 10px 0; align-items:center; }
     .actors button { width:48px; height:48px; border:2px solid #ccc; border-radius:10px; background:#fff; padding:2px; }
     .actors button.on { border-color:#ffbf00; }
     .actors button img { width:100%; }
+    .bgpick { display:flex; gap:8px; padding:0 10px 6px; }
+    .bgpick button { flex:1; height:36px; border:2px solid #ccc; border-radius:10px; }
+    .bgpick button.on { border-color:#333; }
     .striprow { display:flex; gap:8px; align-items:stretch; margin:6px 10px; }
     .strip {
       direction:ltr; flex:1; min-height:74px; background:#fff; border-radius:10px;
@@ -50,34 +64,37 @@
       width:56px; border:0; border-radius:10px; background:#fff; color:#c0392b;
       font-size:26px; font-weight:900; box-shadow:inset 0 0 0 2px #e0e0e0;
     }
-    .cats { display:flex; gap:6px; padding:0 10px; }
+    .cats { display:flex; gap:6px; padding:0 10px; flex-wrap:wrap; }
     .cats button { width:34px; height:26px; border:0; border-radius:8px; }
     .cats button.on { outline:3px solid #333; }
     .palette { direction:ltr; display:flex; gap:8px; overflow-x:auto; padding:4px 10px 8px; }
     .block {
       direction:ltr; border:0; color:#fff; font-weight:800;
       min-width:72px; height:56px; padding:0 8px;
-      display:inline-flex; align-items:center; justify-content:center; gap:3px;
-      font-size:20px; border-radius:8px 16px 16px 14px;
+      display:inline-flex; flex-direction:column; align-items:center; justify-content:center;
+      font-size:18px; border-radius:8px 16px 16px 14px; position:relative;
     }
     .block.motion { background:var(--motion); box-shadow:0 4px 0 var(--motion-d); }
     .block.trigger { background:var(--trigger); box-shadow:0 4px 0 var(--trigger-d); color:#333; }
     .block.looks { background:var(--looks); box-shadow:0 4px 0 var(--looks-d); }
+    .block.sound { background:var(--sound); box-shadow:0 4px 0 var(--sound-d); }
+    .block.control { background:var(--control); box-shadow:0 4px 0 var(--control-d); color:#333; }
     .block.end { background:var(--end); box-shadow:0 4px 0 var(--end-d); }
-    .block.in { margin-left:-6px; }
+    .block.in { margin-left:-6px; min-width:68px; }
     .block.in:first-child { margin-left:0; }
-    .block small { font-size:10px; }
+    .block small { font-size:10px; line-height:1; }
+    .num {
+      position:absolute; bottom:-2px; right:4px; background:#fff; color:#333;
+      border-radius:8px; font-size:12px; font-weight:900; padding:0 5px; border:1px solid #999;
+    }
     .say { margin:0; padding:0 12px 6px; font-weight:800; min-height:1.2em; }
     .say.good { color:#2d8a38; }
     .nextbar { padding:0 10px calc(10px + env(safe-area-inset-bottom)); }
-    .next {
-      width:100%; height:54px; border:0; border-radius:14px;
-      background:#3cb44a; color:#fff; font:inherit; font-weight:900; font-size:20px;
-    }
+    .next { width:100%; height:54px; border:0; border-radius:14px; background:#3cb44a; color:#fff; font:inherit; font-weight:900; font-size:20px; }
     .overlay {
       position:absolute; inset:0; background:rgba(242,242,242,.98); z-index:8;
       display:flex; flex-direction:column; justify-content:flex-end;
-      padding:18px 14px calc(18px + env(safe-area-inset-bottom)); gap:8px;
+      padding:18px 14px calc(18px + env(safe-area-inset-bottom)); gap:8px; overflow:auto;
     }
     .overlay h2 { margin:0; font-size:24px; }
     .overlay p { margin:0; font-size:16px; font-weight:700; }
@@ -88,9 +105,7 @@
     }
     .lessons button small { display:block; color:#666; font-weight:700; }
     .lessons button:disabled { opacity:.4; }
-    .bgpick { display:flex; gap:8px; padding:0 10px 6px; }
-    .bgpick button { flex:1; height:36px; border:2px solid #ccc; border-radius:10px; }
-    .bgpick button.on { border-color:#333; }
+    .mod { margin:8px 0 0; font-size:13px; color:#666; font-weight:800; }
     .hidden { display:none !important; }
   </style>
 </head>
@@ -103,8 +118,10 @@
     <div class="stage-wrap">
       <div class="stage bg-sky" id="stage">
         <button class="flag" id="flag" type="button">⚑</button>
+        <div class="pagebadge hidden" id="pagebadge">עמוד 1</div>
         <div class="grid" id="grid"></div>
         <div class="star hidden" id="star">★</div>
+        <div class="bubble" id="bubble"></div>
         <div class="sprite" id="sp-cat" data-who="cat"><img src="img/cat.png" alt=""></div>
         <div class="sprite hidden" id="sp-dog" data-who="dog"><img src="img/dog.png" alt=""></div>
       </div>
@@ -116,10 +133,11 @@
         <button type="button" data-bg="bg-sky" class="on" style="background:linear-gradient(#7ec8f8,#8fd16a)"></button>
         <button type="button" data-bg="bg-night" style="background:linear-gradient(#1b2a4a,#2f4a2a)"></button>
         <button type="button" data-bg="bg-beach" style="background:linear-gradient(#87ceeb,#f2d38a)"></button>
+        <button type="button" data-bg="bg-race" style="background:linear-gradient(#9fd0ff,#c9c9c9)"></button>
       </div>
       <div class="striprow">
         <div class="strip empty" id="strip"></div>
-        <button class="trash" id="trash" type="button" title="נקה">⌫</button>
+        <button class="trash" id="trash" type="button">⌫</button>
       </div>
       <div class="cats" id="cats"></div>
       <div class="palette" id="palette"></div>
@@ -129,34 +147,64 @@
       </div>
     </div>
     <div class="overlay" id="menu">
-      <h2>ScratchJr</h2>
-      <p>בחרי שיעור. אחרי שגומרים, לוחצים שיעור הבא.</p>
+      <h2>ScratchJr · כל הסדרה</h2>
+      <p>מודול 1 קולאז׳ · מודול 2 סיפור · מודול 3 משחק</p>
       <div class="lessons" id="lessons"></div>
     </div>
   </div>
 <script>
-const STORE = "evelyn-sj-v2";
+const STORE = "evelyn-sj-v3";
+const TAB_COLORS = {
+  trigger:"#FFBF00", motion:"#4C97FF", looks:"#9966FF",
+  sound:"#CF63CF", control:"#FFAB19", end:"#FF6680"
+};
 const BLOCKS = {
-  trigger: [{id:"flag", name:"דגל", icon:"⚑", cls:"trigger"}],
+  trigger: [
+    {id:"flag", name:"דגל", icon:"⚑", cls:"trigger"},
+    {id:"tap", name:"נגיעה", icon:"👆", cls:"trigger"},
+    {id:"bump", name:"התנגשות", icon:"💥", cls:"trigger"},
+    {id:"msg", name:"הודעה", icon:"✉", cls:"trigger"}
+  ],
   motion: [
-    {id:"right", name:"ימינה", icon:"→", cls:"motion"},
-    {id:"left", name:"שמאלה", icon:"←", cls:"motion"},
-    {id:"up", name:"למעלה", icon:"↑", cls:"motion"},
-    {id:"down", name:"למטה", icon:"↓", cls:"motion"},
+    {id:"right", name:"ימינה", icon:"→", cls:"motion", numbered:true},
+    {id:"left", name:"שמאלה", icon:"←", cls:"motion", numbered:true},
+    {id:"up", name:"למעלה", icon:"↑", cls:"motion", numbered:true},
+    {id:"down", name:"למטה", icon:"↓", cls:"motion", numbered:true},
+    {id:"hop", name:"קפיצה", icon:"⤴", cls:"motion", numbered:true},
     {id:"home", name:"בית", icon:"⌂", cls:"motion"}
   ],
   looks: [
     {id:"bigger", name:"גדול", icon:"+", cls:"looks"},
-    {id:"smaller", name:"קטן", icon:"−", cls:"looks"}
+    {id:"smaller", name:"קטן", icon:"−", cls:"looks"},
+    {id:"hide", name:"הסתר", icon:"◌", cls:"looks"},
+    {id:"show", name:"הצג", icon:"●", cls:"looks"},
+    {id:"say", name:"דבר", icon:"💬", cls:"looks"}
   ],
-  end: [{id:"end", name:"סוף", icon:"■", cls:"end"}]
+  sound: [
+    {id:"pop", name:"צליל", icon:"♪", cls:"sound"}
+  ],
+  control: [
+    {id:"speed", name:"מהירות", icon:"⚡", cls:"control"},
+    {id:"wait", name:"חכה", icon:"⏱", cls:"control", numbered:true},
+    {id:"repeat", name:"חזרה", icon:"↻", cls:"control", numbered:true},
+    {id:"forever", name:"תמיד", icon:"∞", cls:"control"},
+    {id:"page", name:"עמוד", icon:"📄", cls:"control"},
+    {id:"send", name:"שלח", icon:"➤", cls:"control"},
+    {id:"stop", name:"עצור", icon:"■", cls:"control"}
+  ],
+  end: [
+    {id:"end", name:"סוף", icon:"■", cls:"end"}
+  ]
 };
-const TAB_COLORS = {trigger:"#FFBF00", motion:"#4C97FF", looks:"#9966FF", end:"#FF6680"};
 const LESSONS = [
-  {n:1, title:"הוראות", sub:"בלוק אחד. לחצי עליו."},
-  {n:2, title:"סדר", sub:"כמה בלוקים עד הכוכב."},
-  {n:3, title:"דגל ירוק", sub:"דגל בהתחלה. סוף בסוף."},
-  {n:4, title:"רקע", sub:"בחרי רקע. שתי דמויות."}
+  {n:1, mod:"מודול 1", title:"הוראות", sub:"בלוק אחד. לחצי עליו."},
+  {n:2, mod:"מודול 1", title:"סדר", sub:"כמה בלוקים עד הכוכב."},
+  {n:3, mod:"מודול 1", title:"דגל ירוק", sub:"דגל בהתחלה. סוף בסוף."},
+  {n:4, mod:"מודול 1", title:"רקע", sub:"בחרי רקע. שתי דמויות."},
+  {n:5, mod:"מודול 2", title:"מהירות", sub:"מירוץ. מהירות שונה לכל דמות."},
+  {n:6, mod:"מודול 2", title:"מספרים וחזרה", sub:"מספר על בלוק, או חזרה."},
+  {n:7, mod:"מודול 2", title:"דיבור ועמוד", sub:"דבר, חכה, עמוד הבא."},
+  {n:8, mod:"מודול 3", title:"נגיעה והודעות", sub:"נגיעה, התנגשות, שליחת הודעה."}
 ];
 
 const stage = document.getElementById("stage");
@@ -172,336 +220,470 @@ const title = document.getElementById("title");
 const menu = document.getElementById("menu");
 const nextbar = document.getElementById("nextbar");
 const bgpick = document.getElementById("bgpick");
+const bubble = document.getElementById("bubble");
+const pagebadge = document.getElementById("pagebadge");
 
-let lesson = 1, tab = "motion", who = "cat", busy = false, done = false;
+let lesson=1, tab="motion", who="cat", busy=false, done=false, page=1, stopAll=false;
 let state = load();
-const actors = {
-  cat: {col:1, row:1, scale:1, script:[]},
-  dog: {col:0, row:1, scale:1, script:[]}
-};
+const actors = freshActors();
 
 for (let i=0;i<9;i++) grid.appendChild(Object.assign(document.createElement("div"),{className:"cell"}));
 
 function load() {
-  try { return JSON.parse(localStorage.getItem(STORE)) || {unlocked:1, completed:[]}; }
-  catch(e) { return {unlocked:1, completed:[]}; }
+  try {
+    const s = JSON.parse(localStorage.getItem(STORE));
+    if (s) return s;
+  } catch(e) {}
+  // migrate: she finished 1–4
+  return {unlocked:5, completed:[1,2,3,4]};
 }
-function save() { localStorage.setItem(STORE, JSON.stringify(state)); }
-function find(id) { return Object.values(BLOCKS).flat().find(b => b.id===id); }
-function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+function save(){ localStorage.setItem(STORE, JSON.stringify(state)); }
+function freshActors(){
+  return {
+    cat:{col:1,row:1,scale:1,opacity:1,speed:1,script:[],_seen:new Set()},
+    dog:{col:0,row:1,scale:1,opacity:1,speed:1,script:[],_seen:new Set()}
+  };
+}
+function find(id){ return Object.values(BLOCKS).flat().find(b=>b.id===id); }
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+function beep(){
+  try {
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const o = ctx.createOscillator(); const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.frequency.value=880; g.gain.value=0.05; o.start();
+    setTimeout(()=>{ o.stop(); ctx.close(); }, 120);
+  } catch(e) {}
+}
 
-function pos(c,r) {
-  const g = grid.getBoundingClientRect(), s = stage.getBoundingClientRect();
+function pos(c,r){
+  const g=grid.getBoundingClientRect(), s=stage.getBoundingClientRect();
   const cw=g.width/3, ch=g.height/3;
   return {left:(g.left-s.left)+c*cw+cw/2, top:(g.top-s.top)+r*ch+ch/2-28};
 }
-function drawOne(id) {
-  const a = actors[id];
-  const el = document.getElementById("sp-"+id);
-  const p = pos(a.col, a.row);
-  el.style.left = p.left+"px";
-  el.style.top = p.top+"px";
-  el.style.transform = "scale("+a.scale+")";
+function drawOne(id){
+  const a=actors[id], el=document.getElementById("sp-"+id);
+  const p=pos(a.col,a.row);
+  el.style.left=p.left+"px"; el.style.top=p.top+"px";
+  el.style.transform="scale("+a.scale+")";
+  el.style.opacity=a.opacity;
+  el.style.transitionDuration=(0.3/Math.max(0.4,a.speed))+"s";
   el.classList.toggle("sel", who===id && lesson>=3);
 }
-function drawAll() { drawOne("cat"); drawOne("dog"); }
-function placeStar(on) {
-  star.classList.toggle("hidden", !on);
-  if (!on) return;
-  const p = pos(2,1);
-  star.style.left = p.left+"px";
-  star.style.top = (p.top+4)+"px";
+function drawAll(){ drawOne("cat"); drawOne("dog"); }
+function placeStar(on,c=2,r=1){
+  star.classList.toggle("hidden",!on);
+  if(!on) return;
+  const p=pos(c,r); star.style.left=p.left+"px"; star.style.top=(p.top+4)+"px";
 }
-function resetActors() {
-  actors.cat = {col:1, row:1, scale:1, script: actors.cat.script};
-  actors.dog = {col:0, row:1, scale:1, script: actors.dog.script};
-  drawAll();
+function showBubble(id, text){
+  const a=actors[id]; const p=pos(a.col,a.row);
+  bubble.style.display="block";
+  bubble.textContent=text;
+  bubble.style.left=(p.left+20)+"px";
+  bubble.style.top=(p.top-36)+"px";
 }
-function applyTo(id, bid) {
-  const a = actors[id];
-  a._seen = a._seen || new Set();
-  if (["right","left","up","down"].includes(bid)) a._seen.add(bid);
-  if (bid==="right") a.col=Math.min(2,a.col+1);
-  if (bid==="left") a.col=Math.max(0,a.col-1);
-  if (bid==="up") a.row=Math.max(0,a.row-1);
-  if (bid==="down") a.row=Math.min(2,a.row+1);
-  if (bid==="home" || bid==="flag") { a.col = id==="dog"?0:1; a.row=1; a.scale=1; }
-  if (bid==="bigger") a.scale=Math.min(1.35,a.scale+0.18);
-  if (bid==="smaller") a.scale=Math.max(0.7,a.scale-0.18);
-  drawOne(id);
-}
+function hideBubble(){ bubble.style.display="none"; }
 
-function currentScript() { return actors[who].script; }
-function setScript(arr) { actors[who].script = arr; }
+function currentScript(){ return actors[who].script; }
+function setScript(arr){ actors[who].script=arr; }
 
-function removeAt(i) {
-  if (busy) return;
-  const script = currentScript().slice();
-  script.splice(i, 1);
-  setScript(script);
-  renderStrip();
-  say.className = "say";
-  say.textContent = script.length ? "הורדנו בלוק" : "השורה ריקה";
-  done = false;
-  nextbar.classList.add("hidden");
+function removeAt(i){
+  if(busy) return;
+  const script=currentScript().slice(); script.splice(i,1);
+  setScript(script); renderStrip();
+  say.className="say"; say.textContent=script.length?"הורדנו בלוק":"השורה ריקה";
+  done=false; nextbar.classList.add("hidden");
 }
-function clearStrip() {
-  if (busy) return;
-  setScript([]);
-  renderStrip();
-  say.className = "say";
-  say.textContent = "השורה ריקה";
-  done = false;
-  nextbar.classList.add("hidden");
+function clearStrip(){
+  if(busy) return; setScript([]); renderStrip();
+  say.className="say"; say.textContent="השורה ריקה";
+  done=false; nextbar.classList.add("hidden");
 }
-function renderStrip() {
-  const script = currentScript();
-  strip.innerHTML = "";
-  strip.classList.toggle("empty", !script.length);
-  script.forEach((id,i) => {
-    const def = find(id);
-    const b = document.createElement("button");
+function bumpNum(i, delta){
+  const script=currentScript().slice();
+  const step=script[i];
+  if(!step || typeof step==="string") return;
+  const def=find(step.id);
+  if(!def || !def.numbered) return;
+  step.n = Math.max(1, Math.min(6, (step.n||1)+delta));
+  setScript(script); renderStrip();
+}
+function renderStrip(){
+  const script=currentScript();
+  strip.innerHTML=""; strip.classList.toggle("empty",!script.length);
+  script.forEach((step,i)=>{
+    const id = typeof step==="string" ? step : step.id;
+    const n = typeof step==="string" ? null : step.n;
+    const def=find(id);
+    const b=document.createElement("button");
     b.type="button"; b.className="block in "+def.cls;
-    b.innerHTML = def.icon+"<small>"+def.name+"</small>";
-    b.addEventListener("click", () => {
-      if (lesson===1) runOne(i);
-      else removeAt(i);
+    b.innerHTML = def.icon+"<small>"+def.name+"</small>"+(n?('<span class="num">'+n+"</span>"):"");
+    b.addEventListener("click", ()=>{
+      if(lesson===1) runOne(i);
+      else if(def.numbered && (lesson===6 || lesson===7) && n!=null){
+        // tap cycles number 1..4 then remove on long pattern — use double: left half cycle
+        bumpNum(i, 1);
+      } else removeAt(i);
     });
     strip.appendChild(b);
   });
 }
-function addBlock(id) {
-  if (busy) return;
-  let script = currentScript().slice();
-  if (lesson===1) script = [id];
-  if (lesson===3 || lesson===4) {
-    if (id==="flag") script = ["flag", ...script.filter(x=>x!=="flag" && x!=="end")];
-    else if (id==="end") {
-      script = script.filter(x=>x!=="end");
-      if (!script.includes("flag")) script.unshift("flag");
+function pack(id){
+  const def=find(id);
+  if(def && def.numbered) return {id, n: id==="wait"?2 : id==="repeat"?2 : 2};
+  return id;
+}
+function addBlock(id){
+  if(busy) return;
+  let script=currentScript().slice();
+  if(lesson===1){ script=[id]; setScript(script); renderStrip(); return; }
+  if([3,4,5,6,7,8].includes(lesson)){
+    const item=pack(id);
+    if(id==="flag"||id==="tap"||id==="bump"||id==="msg"){
+      script=script.filter(s=>{
+        const x=typeof s==="string"?s:s.id;
+        return !["flag","tap","bump","msg","end"].includes(x);
+      });
+      script.unshift(item);
+    } else if(id==="end"){
+      script=script.filter(s=>(typeof s==="string"?s:s.id)!=="end");
+      if(!script.length || !["flag","tap","bump","msg"].includes(typeof script[0]==="string"?script[0]:script[0].id))
+        script.unshift("flag");
       script.push("end");
     } else {
-      const hasEnd = script.includes("end");
-      script = script.filter(x=>x!=="end");
-      if (!script.includes("flag")) script.unshift("flag");
-      script.push(id);
-      if (hasEnd) script.push("end");
+      const hasEnd=script.some(s=>(typeof s==="string"?s:s.id)==="end");
+      script=script.filter(s=>(typeof s==="string"?s:s.id)!=="end");
+      if(lesson>=3 && (!script.length || !["flag","tap","bump","msg"].includes(typeof script[0]==="string"?script[0]:script[0].id)))
+        script.unshift(lesson===8 && id!=="send" ? "flag" : "flag");
+      if(lesson===8 && ["tap","bump","msg"].includes(id)){ /* already handled */ }
+      else script.push(item);
+      if(hasEnd) script.push("end");
     }
   } else {
-    if (script.length>=6) return;
-    script.push(id);
+    if(script.length>=8) return;
+    script.push(pack(id));
   }
-  setScript(script);
-  renderStrip();
-  say.textContent = "";
-  done = false;
-  nextbar.classList.add("hidden");
+  setScript(script); renderStrip();
+  say.textContent=""; done=false; nextbar.classList.add("hidden");
 }
 
-async function runOne(i) {
-  if (busy) return;
-  busy = true;
-  const id = currentScript()[i];
-  applyTo(who, id);
-  await sleep(280);
-  busy = false;
-  checkLesson();
-}
-async function runScript(id, from) {
-  if (busy) return;
-  busy = true;
-  say.textContent = "";
-  const a = actors[id];
-  a.col = id==="dog"?0:1; a.row=1; a.scale=1; drawOne(id);
-  await sleep(180);
-  const steps = a.script.slice(from).filter(x => x!=="end");
-  for (const bid of steps) {
-    if (bid==="flag") continue;
-    applyTo(id, bid);
-    await sleep(420);
+function applyTo(id, bid, n=1){
+  const a=actors[id];
+  a._seen=a._seen||new Set();
+  if(["right","left","up","down"].includes(bid)) a._seen.add(bid);
+  for(let k=0;k<n;k++){
+    if(bid==="right") a.col=Math.min(2,a.col+1);
+    if(bid==="left") a.col=Math.max(0,a.col-1);
+    if(bid==="up") a.row=Math.max(0,a.row-1);
+    if(bid==="down") a.row=Math.min(2,a.row+1);
+    if(bid==="hop"){ a.row=Math.max(0,a.row-1); drawOne(id); }
   }
-  busy = false;
-  checkLesson();
+  if(bid==="home"||bid==="flag"){ a.col=id==="dog"?0:1; a.row=1; a.scale=1; a.opacity=1; }
+  if(bid==="bigger") a.scale=Math.min(1.4,a.scale+0.18);
+  if(bid==="smaller") a.scale=Math.max(0.65,a.scale-0.18);
+  if(bid==="hide") a.opacity=0.15;
+  if(bid==="show") a.opacity=1;
+  if(bid==="speed") a.speed = a.speed>=1.8 ? 0.55 : a.speed>=1 ? 1.8 : 1;
+  drawOne(id);
 }
-async function runFlag() {
-  if (busy) return;
-  if (lesson < 3) {
-    if (lesson===2 && actors.cat.script.length) return runScript("cat", 0);
-    say.textContent = "בשיעור 3 הדגל מפעיל את השורה";
-    return;
-  }
-  const list = lesson>=3 ? ["cat","dog"].filter(id => !document.getElementById("sp-"+id).classList.contains("hidden") && actors[id].script.length) : ["cat"];
-  if (!list.length) { say.textContent = "שימי דגל ואז בלוקים"; return; }
-  busy = true;
-  say.textContent = "";
-  list.forEach(id => { actors[id].col = id==="dog"?0:1; actors[id].row=1; actors[id].scale=1; drawOne(id); });
-  await sleep(180);
-  const max = Math.max(...list.map(id => actors[id].script.filter(x=>x!=="flag"&&x!=="end").length));
-  for (let i=0;i<max;i++) {
-    for (const id of list) {
-      const steps = actors[id].script.filter(x => x!=="flag" && x!=="end");
-      if (i < steps.length) applyTo(id, steps[i]);
+
+function expand(script){
+  // expand repeat once for linear run; forever capped
+  const out=[];
+  for(let i=0;i<script.length;i++){
+    const step=script[i];
+    const id=typeof step==="string"?step:step.id;
+    const n=typeof step==="string"?1:(step.n||1);
+    if(id==="repeat"){
+      const body=[];
+      for(let j=i+1;j<script.length;j++){
+        const sid=typeof script[j]==="string"?script[j]:script[j].id;
+        if(["end","forever","repeat","flag","tap","bump","msg"].includes(sid)) break;
+        body.push(script[j]);
+      }
+      for(let r=0;r<n;r++) out.push(...body);
+      // skip body already consumed? keep simple: also leave body in stream — better skip
+      i += body.length;
+      continue;
     }
-    await sleep(420);
+    if(id==="forever"){
+      const body=script.slice(i+1).filter(s=>{
+        const sid=typeof s==="string"?s:s.id;
+        return !["end","flag","tap","bump","msg"].includes(sid);
+      });
+      for(let r=0;r<3;r++) out.push(...body); // demo 3 loops not infinite hang
+      break;
+    }
+    out.push(step);
   }
-  busy = false;
-  checkLesson();
+  return out;
 }
 
-function markDone() {
-  done = true;
-  if (!state.completed.includes(lesson)) state.completed.push(lesson);
-  state.unlocked = Math.max(state.unlocked, lesson+1, 1);
+async function runActor(id, trigger){
+  const a=actors[id];
+  let script=a.script.slice();
+  if(!script.length) return false;
+  const first=typeof script[0]==="string"?script[0]:script[0].id;
+  if(trigger && first!==trigger && !(trigger==="flag" && first==="flag")) return false;
+  if(["flag","tap","bump","msg"].includes(first)) script=script.slice(1);
+  script=script.filter(s=>(typeof s==="string"?s:s.id)!=="end");
+  script=expand(script);
+  a.col=id==="dog"?0:1; a.row=1; a.scale=1; a.opacity=1; a.speed=a.speed||1; drawOne(id);
+  for(const step of script){
+    if(stopAll) break;
+    const bid=typeof step==="string"?step:step.id;
+    const n=typeof step==="string"?1:(step.n||1);
+    if(bid==="wait"){ await sleep(350*n); continue; }
+    if(bid==="say"){ showBubble(id, id==="cat"?"היי!":"ווף!"); await sleep(700); hideBubble(); continue; }
+    if(bid==="pop"){ beep(); await sleep(200); continue; }
+    if(bid==="page"){ page=2; pagebadge.textContent="עמוד 2"; pagebadge.classList.remove("hidden"); stage.className="stage bg-night"; await sleep(300); continue; }
+    if(bid==="send"){
+      // trigger other actor's msg script
+      const other=id==="cat"?"dog":"cat";
+      await runActor(other, "msg");
+      continue;
+    }
+    if(bid==="stop"){ stopAll=true; break; }
+    if(bid==="speed"){ applyTo(id,"speed"); await sleep(200); continue; }
+    applyTo(id, bid, ["right","left","up","down","hop"].includes(bid)?n:1);
+    await sleep(420/Math.max(0.45,a.speed));
+    if(bid==="hop"){ a.row=Math.min(2,a.row+1); drawOne(id); await sleep(220/Math.max(0.45,a.speed)); }
+  }
+  return true;
+}
+
+async function runOne(i){
+  if(busy) return; busy=true;
+  const step=currentScript()[i];
+  const id=typeof step==="string"?step:step.id;
+  applyTo(who,id); await sleep(280); busy=false; checkLesson();
+}
+
+async function runFlag(){
+  if(busy) return;
+  if(lesson===1){ say.textContent="בשיעור 1 לוחצים על הבלוק בשורה"; return; }
+  if(lesson===2){
+    if(!actors.cat.script.length){ say.textContent="שימי בלוקים"; return; }
+    busy=true; stopAll=false; await runActor("cat", null); // no trigger required
+    // force run without trigger check
+    busy=false; checkLesson(); return;
+  }
+  busy=true; stopAll=false; hideBubble();
+  const list=["cat","dog"].filter(id=>!document.getElementById("sp-"+id).classList.contains("hidden") && actors[id].script.length);
+  // parallel-ish: run sequentially interleaved by expanding each
+  await Promise.all(list.map(id=>runActor(id,"flag")));
+  // bump check after moves
+  if(lesson===8) maybeBump();
+  busy=false; checkLesson();
+}
+
+function maybeBump(){
+  if(actors.cat.col===actors.dog.col && actors.cat.row===actors.dog.row){
+    // fire bump scripts
+    ["cat","dog"].forEach(id=>{
+      const first=actors[id].script[0];
+      const fid=first && (typeof first==="string"?first:first.id);
+      if(fid==="bump") runActor(id,"bump");
+    });
+  }
+}
+
+function markDone(){
+  if(done) return;
+  done=true;
+  if(!state.completed.includes(lesson)) state.completed.push(lesson);
+  state.unlocked=Math.max(state.unlocked, lesson+1);
   save();
-  say.className = "say good";
+  say.className="say good";
   nextbar.classList.remove("hidden");
-  document.getElementById("nextBtn").textContent = lesson>=4 ? "סיימתי את הכל ★" : "שיעור " + (lesson+1);
+  document.getElementById("nextBtn").textContent = lesson>=8 ? "סיימתי את כל הסדרה ★" : "שיעור "+(lesson+1);
 }
 
-function checkLesson() {
-  if (lesson===1) {
+function checkLesson(){
+  if(done) return;
+  if(lesson===1){
     const need=["right","left","up","down"];
-    const seen = new Set(actors.cat.script);
-    // also count applied via taps - store on actor
-    actors.cat._seen = actors.cat._seen || new Set();
-    actors.cat.script.forEach(id => actors.cat._seen.add(id));
-    const left = need.filter(id => !actors.cat._seen.has(id));
-    if (!left.length) {
-      say.textContent = "כל הכיוונים. יאללה הלאה.";
-      markDone();
-    } else {
-      const names={right:"ימינה",left:"שמאלה",up:"למעלה",down:"למטה"};
-      say.className="say";
-      say.textContent = "עוד " + left.map(id=>names[id]).join(" · ");
-    }
+    const seen=actors.cat._seen||new Set();
+    const left=need.filter(id=>!seen.has(id));
+    if(!left.length){ say.textContent="כל הכיוונים."; markDone(); }
+    else { const names={right:"ימינה",left:"שמאלה",up:"למעלה",down:"למטה"}; say.className="say"; say.textContent="עוד "+left.map(id=>names[id]).join(" · "); }
   }
-  if (lesson===2) {
-    if (actors.cat.col===2 && actors.cat.row===1) {
-      say.textContent = "הגעת לכוכב.";
-      markDone();
-    } else {
-      say.className="say";
-      say.textContent = "עוד לא על הכוכב.";
-    }
+  if(lesson===2){
+    if(actors.cat.col===2&&actors.cat.row===1){ say.textContent="הגעת לכוכב."; markDone(); }
+    else { say.className="say"; say.textContent="עוד לא על הכוכב."; }
   }
-  if (lesson===3) {
-    const s = actors.cat.script;
-    const ok = s[0]==="flag" && s.includes("end") && s.filter(x=>!["flag","end"].includes(x)).length>=1;
-    if (ok && !done) {
-      say.textContent = "דגל בהתחלה. סוף בסוף.";
-      markDone();
-    } else if (!done) {
-      say.className="say";
-      if (s[0]!=="flag") say.textContent = "שימי דגל בהתחלה";
-      else if (!s.includes("end")) say.textContent = "שימי סוף בסוף";
-      else say.textContent = "לחצי על הדגל הירוק";
-    }
+  if(lesson===3){
+    const s=actors.cat.script.map(x=>typeof x==="string"?x:x.id);
+    const ok=s[0]==="flag" && s.includes("end") && s.some(x=>!["flag","end"].includes(x));
+    if(ok){ say.textContent="דגל בהתחלה. סוף בסוף."; markDone(); }
+    else { say.className="say"; say.textContent=s[0]!=="flag"?"שימי דגל בהתחלה":(!s.includes("end")?"שימי סוף בסוף":"לחצי על הדגל הירוק"); }
   }
-  if (lesson===4) {
-    const bgOk = !stage.classList.contains("bg-sky") || state._bgChanged;
-    const moved = ["cat","dog"].some(id => actors[id].script.filter(x=>!["flag","end"].includes(x)).length>=1);
-    if (bgOk && moved && actors.cat.script[0]==="flag") {
-      say.textContent = "רקע + דמויות. מודול 1 גמור.";
-      markDone();
-    } else {
-      say.className="say";
-      if (!bgOk) say.textContent = "בחרי רקע אחר";
-      else say.textContent = "תני לדמות לזוז עם הדגל";
-    }
+  if(lesson===4){
+    const bgOk=state._bgChanged;
+    const moved=["cat","dog"].some(id=>actors[id].script.some(s=>{const x=typeof s==="string"?s:s.id; return !["flag","end"].includes(x);}));
+    if(bgOk && moved){ say.textContent="רקע + דמויות."; markDone(); }
+    else { say.className="say"; say.textContent=!bgOk?"בחרי רקע אחר":"תני לדמות לזוז עם הדגל"; }
+  }
+  if(lesson===5){
+    const usedSpeed=["cat","dog"].some(id=>actors[id].script.some(s=>(typeof s==="string"?s:s.id)==="speed"));
+    const bothMoved = actors.cat.col>1 || actors.dog.col>0 || actors.cat.col!==1 || actors.dog.col!==0;
+    // after flag: at least one moved right and speed used
+    const anyRight=["cat","dog"].some(id=>actors[id].script.some(s=>(typeof s==="string"?s:s.id)==="right"));
+    if(usedSpeed && anyRight && (actors.cat.col!==1 || actors.dog.col!==0)){ say.textContent="מירוץ עם מהירות."; markDone(); }
+    else { say.className="say"; say.textContent=!usedSpeed?"שימי בלוק מהירות":"לחצי על הדגל הירוק למירוץ"; }
+  }
+  if(lesson===6){
+    const s=actors.cat.script;
+    const hasNum=s.some(x=>typeof x!=="string" && x.n>=2 && ["right","left","up","down","hop"].includes(x.id));
+    const hasRep=s.some(x=>(typeof x==="string"?x:x.id)==="repeat" || (typeof x==="string"?x:x.id)==="forever");
+    if((hasNum||hasRep) && (actors.cat.col===2&&actors.cat.row===1)){ say.textContent="מספר או חזרה עד הכוכב."; markDone(); }
+    else { say.className="say"; say.textContent=!(hasNum||hasRep)?"שימי מספר על בלוק (לחיצה) או חזרה":"עוד לא על הכוכב"; }
+  }
+  if(lesson===7){
+    const s=actors.cat.script.map(x=>typeof x==="string"?x:x.id);
+    const ok=s.includes("say") && (s.includes("wait")||s.includes("page")||s.includes("pop"));
+    if(ok && page===2){ say.textContent="דיבור ועמוד."; markDone(); }
+    else if(ok){ say.className="say"; say.textContent="עכשיו בלוק עמוד, ואז דגל ירוק"; }
+    else { say.className="say"; say.textContent="שימי דבר + חכה או צליל, ואז עמוד"; }
+  }
+  if(lesson===8){
+    const catT=actors.cat.script[0] && (typeof actors.cat.script[0]==="string"?actors.cat.script[0]:actors.cat.script[0].id);
+    const dogT=actors.dog.script[0] && (typeof actors.dog.script[0]==="string"?actors.dog.script[0]:actors.dog.script[0].id);
+    const used = ["tap","bump","msg"].includes(catT) || ["tap","bump","msg"].includes(dogT) ||
+      actors.cat.script.some(s=>(typeof s==="string"?s:s.id)==="send") ||
+      actors.dog.script.some(s=>(typeof s==="string"?s:s.id)==="send");
+    if(used && state._lesson8Ran){ say.textContent="נגיעה / הודעה."; markDone(); }
+    else { say.className="say"; say.textContent=used?"לחצי על הכלב או על הדגל":"שימי נגיעה / התנגשות / הודעה"; }
   }
 }
 
-function paintTabs() {
-  const tabs = lesson===1 ? ["motion","looks"]
-    : lesson===2 ? ["motion"]
-    : lesson===3 ? ["trigger","motion","end"]
-    : ["trigger","motion","looks","end"];
-  if (!tabs.includes(tab)) tab = tabs[0];
-  catsEl.innerHTML = "";
-  tabs.forEach(id => {
+function tabsForLesson(){
+  if(lesson===1) return ["motion","looks"];
+  if(lesson===2) return ["motion"];
+  if(lesson===3) return ["trigger","motion","end"];
+  if(lesson===4) return ["trigger","motion","looks","end"];
+  if(lesson===5) return ["trigger","motion","control","end"];
+  if(lesson===6) return ["trigger","motion","control","end"];
+  if(lesson===7) return ["trigger","motion","looks","sound","control","end"];
+  return ["trigger","motion","looks","control","end"];
+}
+function paintTabs(){
+  const tabs=tabsForLesson();
+  if(!tabs.includes(tab)) tab=tabs[0];
+  catsEl.innerHTML="";
+  tabs.forEach(id=>{
     const b=document.createElement("button");
     b.type="button"; b.style.background=TAB_COLORS[id];
-    if (id===tab) b.className="on";
-    b.addEventListener("click", ()=>{ tab=id; paintTabs(); paintPalette(); });
+    if(id===tab) b.className="on";
+    b.addEventListener("click",()=>{tab=id; paintTabs();});
     catsEl.appendChild(b);
   });
   paintPalette();
 }
-function paintPalette() {
+function paintPalette(){
   palette.innerHTML="";
-  (BLOCKS[tab]||[]).forEach(def => {
-    if (lesson===1 && def.id==="home") return;
-    if (lesson===2 && def.id==="home") { /* keep home */ }
+  let list=(BLOCKS[tab]||[]).slice();
+  if(lesson<5) list=list.filter(d=>!["speed","repeat","forever","wait","page","send","stop","tap","bump","msg","hop","hide","show","say","pop"].includes(d.id) || (lesson>=2 && d.id==="home") || (lesson>=3 && ["flag","end"].includes(d.id)));
+  if(lesson===1) list=list.filter(d=>!["home","hide","show","say"].includes(d.id));
+  if(lesson===2) list=BLOCKS.motion.filter(d=>d.id!=="hop");
+  if(lesson===3) list = tab==="trigger"?BLOCKS.trigger.filter(d=>d.id==="flag"): tab==="end"?BLOCKS.end:BLOCKS.motion.filter(d=>d.id!=="hop");
+  if(lesson===4) {
+    if(tab==="trigger") list=BLOCKS.trigger.filter(d=>d.id==="flag");
+    if(tab==="motion") list=BLOCKS.motion.filter(d=>d.id!=="hop");
+    if(tab==="looks") list=BLOCKS.looks.filter(d=>["bigger","smaller"].includes(d.id));
+    if(tab==="end") list=BLOCKS.end;
+  }
+  if(lesson===5){
+    if(tab==="trigger") list=BLOCKS.trigger.filter(d=>d.id==="flag");
+    if(tab==="motion") list=BLOCKS.motion.filter(d=>["right","left","home"].includes(d.id));
+    if(tab==="control") list=BLOCKS.control.filter(d=>d.id==="speed");
+    if(tab==="end") list=BLOCKS.end;
+  }
+  if(lesson===6){
+    if(tab==="trigger") list=BLOCKS.trigger.filter(d=>d.id==="flag");
+    if(tab==="motion") list=BLOCKS.motion.filter(d=>["right","left","up","down","home"].includes(d.id));
+    if(tab==="control") list=BLOCKS.control.filter(d=>["repeat","forever"].includes(d.id));
+    if(tab==="end") list=BLOCKS.end;
+  }
+  if(lesson===7){
+    if(tab==="trigger") list=BLOCKS.trigger.filter(d=>d.id==="flag");
+    if(tab==="motion") list=BLOCKS.motion.filter(d=>["right","left","up","down","home"].includes(d.id));
+    if(tab==="looks") list=BLOCKS.looks.filter(d=>d.id==="say");
+    if(tab==="sound") list=BLOCKS.sound;
+    if(tab==="control") list=BLOCKS.control.filter(d=>["wait","page"].includes(d.id));
+    if(tab==="end") list=BLOCKS.end;
+  }
+  if(lesson===8){
+    if(tab==="trigger") list=BLOCKS.trigger.filter(d=>["flag","tap","bump","msg"].includes(d.id));
+    if(tab==="motion") list=BLOCKS.motion.filter(d=>["right","left","up","down","home"].includes(d.id));
+    if(tab==="looks") list=BLOCKS.looks.filter(d=>["bigger","say"].includes(d.id));
+    if(tab==="control") list=BLOCKS.control.filter(d=>["send","stop"].includes(d.id));
+    if(tab==="end") list=BLOCKS.end;
+  }
+  list.forEach(def=>{
     const b=document.createElement("button");
     b.type="button"; b.className="block "+def.cls;
     b.innerHTML=def.icon+"<small>"+def.name+"</small>";
-    b.addEventListener("click", ()=>addBlock(def.id));
+    b.addEventListener("click",()=>addBlock(def.id));
     palette.appendChild(b);
   });
 }
-function paintActors() {
+function paintActors(){
   actorsEl.innerHTML="";
-  const showDog = lesson>=3;
+  const showDog=lesson>=3;
   document.getElementById("sp-dog").classList.toggle("hidden", !showDog);
-  [["cat","חתול"],["dog","כלב"]].forEach(([id,name]) => {
-    if (id==="dog" && !showDog) return;
+  [["cat","חתול"],["dog","כלב"]].forEach(([id,name])=>{
+    if(id==="dog"&&!showDog) return;
     const b=document.createElement("button");
-    b.type="button";
-    b.className = who===id ? "on" : "";
-    b.innerHTML = '<img src="img/'+(id==="cat"?"cat":"dog")+'.png" alt="'+name+'">';
-    b.addEventListener("click", ()=>{ who=id; renderStrip(); paintActors(); drawAll(); });
+    b.type="button"; b.className=who===id?"on":"";
+    b.innerHTML='<img src="img/'+id+'.png" alt="'+name+'">';
+    b.addEventListener("click",()=>{
+      who=id; renderStrip(); paintActors(); drawAll();
+      if(lesson===8){
+        const first=actors[id].script[0];
+        const fid=first && (typeof first==="string"?first:first.id);
+        if(fid==="tap"){ state._lesson8Ran=true; runActor(id,"tap").then(()=>{checkLesson();}); }
+      }
+    });
     actorsEl.appendChild(b);
   });
 }
 
-function startLesson(n) {
-  if (n > state.unlocked) return;
-  lesson = n;
-  who = "cat";
-  done = false;
-  busy = false;
-  actors.cat = {col:1,row:1,scale:1,script:[],_seen:new Set()};
-  actors.dog = {col:0,row:1,scale:1,script:[]};
-  menu.classList.add("hidden");
-  nextbar.classList.add("hidden");
-  say.textContent = "";
-  title.textContent = "שיעור " + n;
-  bgpick.classList.toggle("hidden", n!==4);
-  if (n!==4) {
-    stage.className = "stage bg-sky";
-    state._bgChanged = false;
-  }
-  if (n===1) {
-    hint.textContent = "שימי בלוק. לחצי עליו. נסי ארבעה כיוונים.";
-    placeStar(false); tab="motion";
-  } else if (n===2) {
-    hint.textContent = "שימי בלוקים עד הכוכב. דגל ירוק = קדימה. לחיצה על בלוק = מורידה.";
-    placeStar(true); tab="motion";
-  } else if (n===3) {
-    hint.textContent = "דגל בהתחלה. סוף בסוף. דגל ירוק מפעיל. לחיצה על בלוק מורידה.";
-    placeStar(false); tab="trigger";
-  } else {
-    hint.textContent = "בחרי רקע. דגל ירוק מפעיל. לחיצה על בלוק מורידה.";
-    placeStar(false); tab="trigger";
-  }
-  paintTabs();
-  paintActors();
-  renderStrip();
-  drawAll();
+function startLesson(n){
+  if(n>state.unlocked) return;
+  lesson=n; who="cat"; done=false; busy=false; page=1; stopAll=false; hideBubble();
+  Object.assign(actors, freshActors());
+  menu.classList.add("hidden"); nextbar.classList.add("hidden"); say.textContent="";
+  title.textContent="שיעור "+n;
+  pagebadge.classList.add("hidden"); pagebadge.textContent="עמוד 1";
+  bgpick.classList.toggle("hidden", ![4,5].includes(n));
+  stage.className = n===5 ? "stage bg-race" : "stage bg-sky";
+  state._bgChanged=false; state._lesson8Ran=false;
+  if(n===1){ hint.textContent="שימי בלוק. לחצי עליו. ארבעה כיוונים."; placeStar(false); tab="motion"; }
+  else if(n===2){ hint.textContent="עד הכוכב. דגל ירוק מפעיל. לחיצה על בלוק מורידה."; placeStar(true); tab="motion"; }
+  else if(n===3){ hint.textContent="דגל בהתחלה. סוף בסוף. דגל ירוק מפעיל."; placeStar(false); tab="trigger"; }
+  else if(n===4){ hint.textContent="בחרי רקע. דגל ירוק מפעיל. לחיצה על בלוק מורידה."; placeStar(false); tab="trigger"; }
+  else if(n===5){ hint.textContent="מירוץ: מהירות שונה לכל דמות. דגל ירוק."; placeStar(false); tab="control"; }
+  else if(n===6){ hint.textContent="לחיצה על בלוק תנועה מגדילה מספר. או שימי חזרה. עד הכוכב."; placeStar(true); tab="motion"; }
+  else if(n===7){ hint.textContent="דבר + חכה או צליל + עמוד. אחר כך דגל ירוק."; placeStar(false); tab="looks"; pagebadge.classList.remove("hidden"); }
+  else { hint.textContent="נגיעה על דמות, או שלח הודעה לדמות השנייה."; placeStar(false); tab="trigger"; }
+  paintTabs(); paintActors(); renderStrip(); drawAll();
 }
 
-function showMenu() {
-  menu.classList.remove("hidden");
-  nextbar.classList.add("hidden");
-  const box = document.getElementById("lessons");
-  box.innerHTML = "";
-  LESSONS.forEach(L => {
-    const open = L.n <= state.unlocked;
-    const b = document.createElement("button");
-    b.type="button"; b.disabled=!open;
-    const mark = state.completed.includes(L.n) ? " ✓" : "";
-    b.innerHTML = "שיעור "+L.n+" · "+L.title+mark+"<small>"+L.sub+"</small>";
-    if (open) b.addEventListener("click", ()=>startLesson(L.n));
+function showMenu(){
+  menu.classList.remove("hidden"); nextbar.classList.add("hidden");
+  const box=document.getElementById("lessons"); box.innerHTML="";
+  let lastMod="";
+  LESSONS.forEach(L=>{
+    if(L.mod!==lastMod){
+      const m=document.createElement("div"); m.className="mod"; m.textContent=L.mod; box.appendChild(m); lastMod=L.mod;
+    }
+    const open=L.n<=state.unlocked;
+    const b=document.createElement("button"); b.type="button"; b.disabled=!open;
+    const mark=state.completed.includes(L.n)?" ✓":"";
+    b.innerHTML="שיעור "+L.n+" · "+L.title+mark+"<small>"+L.sub+"</small>";
+    if(open) b.addEventListener("click",()=>startLesson(L.n));
     box.appendChild(b);
   });
 }
@@ -509,25 +691,34 @@ function showMenu() {
 document.getElementById("homeBtn").addEventListener("click", showMenu);
 document.getElementById("flag").addEventListener("click", runFlag);
 document.getElementById("trash").addEventListener("click", clearStrip);
-document.getElementById("nextBtn").addEventListener("click", () => {
-  if (lesson>=4) { showMenu(); return; }
+document.getElementById("nextBtn").addEventListener("click", ()=>{
+  if(lesson>=8){ showMenu(); return; }
   startLesson(lesson+1);
 });
-bgpick.querySelectorAll("button").forEach(btn => {
-  btn.addEventListener("click", () => {
-    stage.className = "stage " + btn.dataset.bg;
-    state._bgChanged = true;
+bgpick.querySelectorAll("button").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    stage.className="stage "+btn.dataset.bg;
+    state._bgChanged=true;
     bgpick.querySelectorAll("button").forEach(x=>x.classList.remove("on"));
     btn.classList.add("on");
-    say.textContent = "";
   });
+});
+document.getElementById("sp-dog").addEventListener("click", ()=>{
+  if(lesson!==8) return;
+  const first=actors.dog.script[0];
+  const fid=first && (typeof first==="string"?first:first.id);
+  if(fid==="tap"){ state._lesson8Ran=true; runActor("dog","tap").then(checkLesson); }
+});
+document.getElementById("sp-cat").addEventListener("click", ()=>{
+  if(lesson!==8) return;
+  const first=actors.cat.script[0];
+  const fid=first && (typeof first==="string"?first:first.id);
+  if(fid==="tap"){ state._lesson8Ran=true; runActor("cat","tap").then(checkLesson); }
 });
 window.addEventListener("resize", ()=>{ drawAll(); if(!star.classList.contains("hidden")) placeStar(true); });
 
-// unlock all 4 for Evelyn's pace once any progress — start with 1, auto unlock on complete
-if (!state.unlocked || state.unlocked < 1) state.unlocked = 1;
-// She already finished 1–2; keep progress if present, else open through 3
-if (!state.completed.length && state.unlocked < 3) state.unlocked = 3;
+if(!state.unlocked) state.unlocked=5;
+if(state.unlocked<5) state.unlocked=5;
 save();
 setTimeout(()=>{ drawAll(); showMenu(); }, 40);
 </script>
