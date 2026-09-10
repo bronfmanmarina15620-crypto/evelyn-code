@@ -40,11 +40,16 @@
     .actors button { width:48px; height:48px; border:2px solid #ccc; border-radius:10px; background:#fff; padding:2px; }
     .actors button.on { border-color:#ffbf00; }
     .actors button img { width:100%; }
+    .striprow { display:flex; gap:8px; align-items:stretch; margin:6px 10px; }
     .strip {
-      direction:ltr; min-height:74px; margin:6px 10px; background:#fff; border-radius:10px;
+      direction:ltr; flex:1; min-height:74px; background:#fff; border-radius:10px;
       display:flex; align-items:center; padding:8px; overflow-x:auto;
     }
     .strip.empty::before { content:"שימי בלוקים כאן"; color:#aaa; font-weight:700; }
+    .trash {
+      width:56px; border:0; border-radius:10px; background:#fff; color:#c0392b;
+      font-size:26px; font-weight:900; box-shadow:inset 0 0 0 2px #e0e0e0;
+    }
     .cats { display:flex; gap:6px; padding:0 10px; }
     .cats button { width:34px; height:26px; border:0; border-radius:8px; }
     .cats button.on { outline:3px solid #333; }
@@ -112,7 +117,10 @@
         <button type="button" data-bg="bg-night" style="background:linear-gradient(#1b2a4a,#2f4a2a)"></button>
         <button type="button" data-bg="bg-beach" style="background:linear-gradient(#87ceeb,#f2d38a)"></button>
       </div>
-      <div class="strip empty" id="strip"></div>
+      <div class="striprow">
+        <div class="strip empty" id="strip"></div>
+        <button class="trash" id="trash" type="button" title="נקה">⌫</button>
+      </div>
       <div class="cats" id="cats"></div>
       <div class="palette" id="palette"></div>
       <p class="say" id="say"></p>
@@ -226,6 +234,26 @@ function applyTo(id, bid) {
 function currentScript() { return actors[who].script; }
 function setScript(arr) { actors[who].script = arr; }
 
+function removeAt(i) {
+  if (busy) return;
+  const script = currentScript().slice();
+  script.splice(i, 1);
+  setScript(script);
+  renderStrip();
+  say.className = "say";
+  say.textContent = script.length ? "הורדנו בלוק" : "השורה ריקה";
+  done = false;
+  nextbar.classList.add("hidden");
+}
+function clearStrip() {
+  if (busy) return;
+  setScript([]);
+  renderStrip();
+  say.className = "say";
+  say.textContent = "השורה ריקה";
+  done = false;
+  nextbar.classList.add("hidden");
+}
 function renderStrip() {
   const script = currentScript();
   strip.innerHTML = "";
@@ -237,8 +265,7 @@ function renderStrip() {
     b.innerHTML = def.icon+"<small>"+def.name+"</small>";
     b.addEventListener("click", () => {
       if (lesson===1) runOne(i);
-      else if (lesson===2) runScript(who, 0);
-      else say.textContent = "לחצי על הדגל הירוק";
+      else removeAt(i);
     });
     strip.appendChild(b);
   });
@@ -448,13 +475,13 @@ function startLesson(n) {
     hint.textContent = "שימי בלוק. לחצי עליו. נסי ארבעה כיוונים.";
     placeStar(false); tab="motion";
   } else if (n===2) {
-    hint.textContent = "שימי בלוקים עד הכוכב. לחצי על הבלוק הראשון.";
+    hint.textContent = "שימי בלוקים עד הכוכב. דגל ירוק = קדימה. לחיצה על בלוק = מורידה.";
     placeStar(true); tab="motion";
   } else if (n===3) {
-    hint.textContent = "דגל בהתחלה. תנועה. סוף בסוף. לחצי על הדגל הירוק.";
+    hint.textContent = "דגל בהתחלה. סוף בסוף. דגל ירוק מפעיל. לחיצה על בלוק מורידה.";
     placeStar(false); tab="trigger";
   } else {
-    hint.textContent = "בחרי רקע. תני לדמות לזוז עם הדגל.";
+    hint.textContent = "בחרי רקע. דגל ירוק מפעיל. לחיצה על בלוק מורידה.";
     placeStar(false); tab="trigger";
   }
   paintTabs();
@@ -481,6 +508,7 @@ function showMenu() {
 
 document.getElementById("homeBtn").addEventListener("click", showMenu);
 document.getElementById("flag").addEventListener("click", runFlag);
+document.getElementById("trash").addEventListener("click", clearStrip);
 document.getElementById("nextBtn").addEventListener("click", () => {
   if (lesson>=4) { showMenu(); return; }
   startLesson(lesson+1);
