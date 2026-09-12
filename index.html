@@ -35,10 +35,10 @@
       position:absolute; top:8px; right:8px; z-index:5;
       background:#fff; border-radius:8px; padding:4px 8px; font-weight:900; font-size:13px;
     }
-    .grid { position:absolute; inset:36px 8px 8px; display:grid; grid-template-columns:repeat(20,1fr); grid-template-rows:repeat(15,1fr); }
+    .grid { position:absolute; inset:36px 8px 8px; display:grid; grid-template-columns:repeat(17,1fr); grid-template-rows:repeat(12,1fr); }
     .cell { border:1px solid rgba(255,255,255,.22); border-radius:0; }
-    .sprite { position:absolute; width:36px; margin-left:-18px; z-index:3; transition:left .3s linear, top .3s linear, transform .2s, opacity .2s; }
-    .sprite img { width:100%; display:block; }
+    .sprite { position:absolute; width:var(--cell, 24px); height:var(--cell, 24px); margin-left:calc(var(--cell, 24px) / -2); z-index:3; transition:left .3s linear, top .3s linear, transform .2s, opacity .2s; object-fit:contain; }
+    .sprite img { width:100%; height:100%; object-fit:contain; display:block; }
     .sprite.sel { outline:3px solid #ffbf00; outline-offset:2px; border-radius:8px; }
     .bubble {
       position:absolute; z-index:6; background:#fff; border:2px solid #333; border-radius:14px;
@@ -227,7 +227,7 @@ let lesson=1, tab="motion", who="cat", busy=false, done=false, page=1, stopAll=f
 let state = load();
 const actors = freshActors();
 
-for (let i=0;i<300;i++) grid.appendChild(Object.assign(document.createElement("div"),{className:"cell"}));
+for (let i=0;i<204;i++) grid.appendChild(Object.assign(document.createElement("div"),{className:"cell"}));
 
 function load() {
   try {
@@ -240,8 +240,8 @@ function load() {
 function save(){ localStorage.setItem(STORE, JSON.stringify(state)); }
 function freshActors(){
   return {
-    cat:{col:10,row:7,scale:1,opacity:1,speed:1,script:[],_seen:new Set()},
-    dog:{col:7,row:7,scale:1,opacity:1,speed:1,script:[],_seen:new Set()}
+    cat:{col:8,row:6,scale:1,opacity:1,speed:1,script:[],_seen:new Set()},
+    dog:{col:5,row:6,scale:1,opacity:1,speed:1,script:[],_seen:new Set()}
   };
 }
 function find(id){ return Object.values(BLOCKS).flat().find(b=>b.id===id); }
@@ -258,20 +258,30 @@ function beep(){
 
 function pos(c,r){
   const g=grid.getBoundingClientRect(), s=stage.getBoundingClientRect();
-  const COLS=20, ROWS=15; const cw=g.width/COLS, ch=g.height/ROWS;
-  return {left:(g.left-s.left)+c*cw+cw/2, top:(g.top-s.top)+r*ch+ch/2-14};
+  const COLS=17, ROWS=12; const cw=g.width/COLS, ch=g.height/ROWS;
+  return {left:(g.left-s.left)+c*cw+cw/2, top:(g.top-s.top)+r*ch+ch/2};
+}
+function cellSize(){
+  const g=grid.getBoundingClientRect();
+  return Math.min(g.width/17, g.height/12);
 }
 function drawOne(id){
   const a=actors[id], el=document.getElementById("sp-"+id);
+  const cell=cellSize();
+  document.documentElement.style.setProperty("--cell", cell+"px");
   const p=pos(a.col,a.row);
-  el.style.left=p.left+"px"; el.style.top=p.top+"px";
+  el.style.left=p.left+"px";
+  el.style.top=p.top+"px";
+  el.style.width=cell+"px";
+  el.style.height=cell+"px";
+  el.style.marginLeft=(-cell/2)+"px";
   el.style.transform="scale("+a.scale+")";
   el.style.opacity=a.opacity;
   el.style.transitionDuration=(0.3/Math.max(0.4,a.speed))+"s";
   el.classList.toggle("sel", who===id && lesson>=3);
 }
 function drawAll(){ drawOne("cat"); drawOne("dog"); }
-function placeStar(on,c=13,r=7){
+function placeStar(on,c=11,r=6){
   star.classList.toggle("hidden",!on);
   if(!on) return;
   const p=pos(c,r); star.style.left=p.left+"px"; star.style.top=(p.top+4)+"px";
@@ -380,13 +390,13 @@ function applyTo(id, bid, n=1){
   a._seen=a._seen||new Set();
   if(["right","left","up","down"].includes(bid)) a._seen.add(bid);
   for(let k=0;k<n;k++){
-    if(bid==="right") a.col=Math.min(19,a.col+1);
+    if(bid==="right") a.col=Math.min(16,a.col+1);
     if(bid==="left") a.col=Math.max(0,a.col-1);
     if(bid==="up") a.row=Math.max(0,a.row-1);
-    if(bid==="down") a.row=Math.min(14,a.row+1);
+    if(bid==="down") a.row=Math.min(11,a.row+1);
     if(bid==="hop"){ a.row=Math.max(0,a.row-1); drawOne(id); }
   }
-  if(bid==="home"||bid==="flag"){ a.col=id==="dog"?7:10; a.row=7; a.scale=1; a.opacity=1; }
+  if(bid==="home"||bid==="flag"){ a.col=id==="dog"?5:8; a.row=6; a.scale=1; a.opacity=1; }
   if(bid==="bigger") a.scale=Math.min(1.4,a.scale+0.18);
   if(bid==="smaller") a.scale=Math.max(0.65,a.scale-0.18);
   if(bid==="hide") a.opacity=0.15;
@@ -436,7 +446,7 @@ async function runActor(id, trigger){
   if(["flag","tap","bump","msg"].includes(first)) script=script.slice(1);
   script=script.filter(s=>(typeof s==="string"?s:s.id)!=="end");
   script=expand(script);
-  a.col=id==="dog"?7:10; a.row=7; a.scale=1; a.opacity=1; a.speed=a.speed||1; drawOne(id);
+  a.col=id==="dog"?5:8; a.row=6; a.scale=1; a.opacity=1; a.speed=a.speed||1; drawOne(id);
   for(const step of script){
     if(stopAll) break;
     const bid=typeof step==="string"?step:step.id;
@@ -455,7 +465,7 @@ async function runActor(id, trigger){
     if(bid==="speed"){ applyTo(id,"speed"); await sleep(200); continue; }
     applyTo(id, bid, ["right","left","up","down","hop"].includes(bid)?n:1);
     await sleep(420/Math.max(0.45,a.speed));
-    if(bid==="hop"){ a.row=Math.min(14,a.row+1); drawOne(id); await sleep(220/Math.max(0.45,a.speed)); }
+    if(bid==="hop"){ a.row=Math.min(11,a.row+1); drawOne(id); await sleep(220/Math.max(0.45,a.speed)); }
   }
   return true;
 }
@@ -517,7 +527,7 @@ function checkLesson(){
     else { const names={right:"ימינה",left:"שמאלה",up:"למעלה",down:"למטה"}; say.className="say"; say.textContent="עוד "+left.map(id=>names[id]).join(" · "); }
   }
   if(lesson===2){
-    if(actors.cat.col===13&&actors.cat.row===7){ say.textContent="הגעת לכוכב."; markDone(); }
+    if(actors.cat.col===11&&actors.cat.row===6){ say.textContent="הגעת לכוכב."; markDone(); }
     else { say.className="say"; say.textContent="עוד לא על הכוכב."; }
   }
   if(lesson===3){
@@ -537,14 +547,14 @@ function checkLesson(){
     const bothMoved = actors.cat.col>1 || actors.dog.col>0 || actors.cat.col!==1 || actors.dog.col!==0;
     // after flag: at least one moved right and speed used
     const anyRight=["cat","dog"].some(id=>actors[id].script.some(s=>(typeof s==="string"?s:s.id)==="right"));
-    if(usedSpeed && anyRight && (actors.cat.col!==10 || actors.dog.col!==7)){ say.textContent="מירוץ עם מהירות."; markDone(); }
+    if(usedSpeed && anyRight && (actors.cat.col!==8 || actors.dog.col!==5)){ say.textContent="מירוץ עם מהירות."; markDone(); }
     else { say.className="say"; say.textContent=!usedSpeed?"שימי בלוק מהירות":"לחצי על הדגל הירוק למירוץ"; }
   }
   if(lesson===6){
     const s=actors.cat.script;
     const hasNum=s.some(x=>typeof x!=="string" && x.n>=2 && ["right","left","up","down","hop"].includes(x.id));
     const hasRep=s.some(x=>(typeof x==="string"?x:x.id)==="repeat" || (typeof x==="string"?x:x.id)==="forever");
-    if((hasNum||hasRep) && (actors.cat.col===13&&actors.cat.row===7)){ say.textContent="מספר או חזרה עד הכוכב."; markDone(); }
+    if((hasNum||hasRep) && (actors.cat.col===11&&actors.cat.row===6)){ say.textContent="מספר או חזרה עד הכוכב."; markDone(); }
     else { say.className="say"; say.textContent=!(hasNum||hasRep)?"שימי מספר על בלוק (לחיצה) או חזרה":"עוד לא על הכוכב"; }
   }
   if(lesson===7){
@@ -668,7 +678,7 @@ function startLesson(n){
   stage.className = n===5 ? "stage bg-race" : "stage bg-sky";
   state._bgChanged=false; state._lesson8Ran=false;
   if(n===1){ hint.textContent="שימי בלוק. לחצי עליו. ארבעה כיוונים."; placeStar(false); tab="motion"; }
-  else if(n===2){ hint.textContent="רשת 20×15 כמו ScratchJr. צעד=1 משבצת. ⌫ מוחק. מספר על בלוק=כמה צעדים."; placeStar(true); tab="motion"; }
+  else if(n===2){ hint.textContent="רשת 17×12. דמות = משבצת אחת. ⌫ מוחק. מספר על בלוק=כמה צעדים."; placeStar(true); tab="motion"; }
   else if(n===3){ hint.textContent="דגל בהתחלה. סוף בסוף. דגל ירוק מפעיל."; placeStar(false); tab="trigger"; }
   else if(n===4){ hint.textContent="בחרי רקע. דגל ירוק מפעיל. לחיצה על בלוק מורידה."; placeStar(false); tab="trigger"; }
   else if(n===5){ hint.textContent="מירוץ: מהירות שונה לכל דמות. דגל ירוק."; placeStar(false); tab="control"; }
