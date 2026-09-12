@@ -322,14 +322,13 @@ function renderStrip(){
     b.innerHTML = def.icon+"<small>"+def.name+"</small>"+(showNum?('<span class="num">'+n+"</span>"):"");
     b.addEventListener("click", (ev)=>{
       if(lesson===1){ runOne(i); return; }
-      // ScratchJr: change the number on the block; use trash to remove
-      if(def.numbered && n!=null && !ev.shiftKey){
+      // Tap the number to change steps (ScratchJr keypad). Tap the block to remove.
+      if(ev.target.classList.contains("num")){
         bumpNum(i, 1);
         return;
       }
       removeAt(i);
     });
-    b.addEventListener("contextmenu", (ev)=>{ ev.preventDefault(); removeAt(i); });
     strip.appendChild(b);
   });
 }
