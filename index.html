@@ -318,11 +318,11 @@ function renderStrip(){
     const def=find(id);
     const b=document.createElement("button");
     b.type="button"; b.className="block in "+def.cls;
-    b.innerHTML = def.icon+"<small>"+def.name+"</small>"+(n?('<span class="num">'+n+"</span>"):"");
+    const showNum = n!=null && (lesson===6 || n>1);
+    b.innerHTML = def.icon+"<small>"+def.name+"</small>"+(showNum?('<span class="num">'+n+"</span>"):"");
     b.addEventListener("click", ()=>{
       if(lesson===1) runOne(i);
-      else if(def.numbered && (lesson===6 || lesson===7) && n!=null){
-        // tap cycles number 1..4 then remove on long pattern — use double: left half cycle
+      else if(def.numbered && lesson===6 && n!=null){
         bumpNum(i, 1);
       } else removeAt(i);
     });
@@ -331,7 +331,11 @@ function renderStrip(){
 }
 function pack(id){
   const def=find(id);
-  if(def && def.numbered) return {id, n: id==="wait"?2 : id==="repeat"?2 : 2};
+  if(def && def.numbered) {
+    // Motion defaults to 1 step. Wait/repeat keep 2 as a useful start.
+    const n = (id==="wait" || id==="repeat") ? 2 : 1;
+    return {id, n};
+  }
   return id;
 }
 function addBlock(id){
